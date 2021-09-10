@@ -1,0 +1,580 @@
+---
+title: 'STAT 110 Section 1: Counting and Intro to R'
+author: "Al Xin"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+*Credit*: Much of this document is sourced from the STAT111 R bootcamp notes. 
+
+## Introduction
+
+R is a coding language that is commonly used in statistics and data science. 
+
+R is object-oriented (though this will not be particularly important for STAT110) and fairly abstract. A useful feature of R is that the language can be run line-by-line and does not require compilation. 
+
+This first section will be a brief introduction to useful features of R. In most cases, looking for R documentation (through Google, Stack Overflow, etc.) will be sufficient. Additionally, many useful R features can only be learned through practice and fluency. 
+
+I use Windows, so I may get some MacOS shortcuts wrong. 
+
+To get the most mileage from this document, I suggest having both the R Markdown file open  alongside the PDF. By default, the chunks are set to not evaluate using `eval = F` (see the source). If you want to see results from each chunk, remove `eval = F` from the very first chunk in the source `.Rmd` file and recompile the document.
+
+If you have additional questions, email me at <axin@college.harvard.edu>. 
+
+## What is R Markdown?
+
+R Markdown is a file format that integrates text editing and R code evaluation. If you're familiar with python, it is similar to using Python or Jupyter notebooks. Using R Markdown, you can create reports with formatted text, LaTeX and R. It is a good offline alternative to Overleaf.
+
+R Markdown files have the extension `.Rmd`. You can view the contents within any text editor (not necessarily RStudio). However, RStudio provides convenient integration of R with the files.
+
+R code in `.Rmd` lives in chunks, which are sandwiched by three grave accents. You can create a chunk by going to the menu bar and selecting Code > Insert Chunk, using the drop down next to Insert at the top right of the file and selecting R, or using the shortcut Ctrl + Alt + I in Windows or Ctrl + Option + I in MacOS.
+
+To run the code in a single chunk, press the green play button in the upper right of the chunk. You can also use Ctrl + Shift + Enter (Windows) or Cmd + Shift + Return (MacOS). To run a single line, select the line and use Ctrl + Enter or Cmd + Return.
+
+In RStudio, you can "knit" R Markdown files to produce documents that execute the code within all the chunks, and incorporates it into a single document along with the text and LaTeX. You can knit the file using the button in the top right or using the keyboard shortcut Ctrl + Shift + K or Cmd + Shift + K in MacOS.
+
+## 1 R Basics
+
+Some features of R:
+
+- R is case-sensitive
+- Indexing begins with 1
+- Comments start with pound signs `#`
+
+### 1.1 Arithmetic
+
+Arithmetic in R automatically follows order of operations. Symbols are consistent
+with most other coding languages. 
+
+```{r math_example}
+# Demonstration of arithmetic
+# This equals 111
+11 + 4 * 5 ^ 2
+# Modulo (remainder) in R
+139560 %% 2021
+```
+
+### 1.2 Data types 
+
+The most important data types we'll use are:
+
+- Logical: `TRUE`, `FALSE`, `T`, `F`
+- Integer: `110`, `111`
+- Numeric: `6.036`
+- Character: `"Conditioning is the soul of statistics"`
+
+R does type assignment automatically; just assign whatever value you need to a variable name. Assignment is accomplished using an arrow, i.e., `<-`. Standard practice is to use left arrows (as demonstrated), though right arrows also work. It is possible to assign using `=`, but it is discouraged. 
+
+You can check data type with the function `class()`.
+
+```{r variable_example, eval = T}
+# Create a numeric variable approximately equal to sqrt(2)
+x <- 1.41421
+y <- 2^(0.5)
+x = 1.41421
+x
+y
+
+round(y)
+# This is equivalent to 1.41421 -> x
+class(x)
+```
+
+### 1.3 Vectors
+
+R's most useful data structures are vectors. These are finite ordered sequences of elements of a single data type (similar to tuples in Python). 
+
+Create vectors using the function `c()`. Index a vector to obtain its components using square brackets. Recall that indexing in R begins with 1, not 0. You can also modify the vector's components using indexing.
+
+Remove elements of a vector through indexing with negative integers. 
+
+```{r vector_example}
+x <- c("hydrogen", 1, 1.01, "gas")
+x[1]
+
+# Notice that 1, 1.001, and x are coerced to "character"
+class(x)
+class(x[2])
+x[2]
+
+# Modify components
+x[3] <- 1.008
+x
+
+# Delete components
+x <- x[-4]
+x[length(x)]
+```
+You can also name the components of a vector and index based on name, though this is rarely used for STAT110.
+
+```{r vector_name}
+names(x) <- c("name", "number", "mass")
+x["number"]
+```
+
+#### 1.3.1 Vector arithmetic
+
+Vectors in R support element-wise operations, which is best illustrated through examples.
+
+```{r}
+# Arithmetic of vectors of the same length
+c(50, 51, 61) + c(110, 111, 139)
+
+# Arithmetic with vectors of differing lengths
+# Shortest vector is recycled (warning if not whole multiple)
+c(121, 124) + c(110, 111, 139)
+c(121, 124) + c(104, 110, 111, 139)
+
+# Arithmetic with constants
+2 * c(110, 111, 139)
+c(1, 2, 3) * c(110, 111, 139)
+100 + c(10, 11, 39)
+c(4, 9, 16) ^ (0.5)
+```
+
+### 1.4 Equality
+
+Standard practice in R is to use `<-` when assigning a value to a variable. When checking for equality, use `==`, i.e., `x == 2`. When assigning arguments, use single equals signs. For example, `mean(c(1, 2, 3, NA), na.rm = T)`.
+
+### 1.5 Lists
+
+For more flexibility, we can use lists, which are ordered collections of elements that can contain more than one data type (including other lists).
+
+Create lists using `list()`. The components of lists can also be named. Index lists with double square brackets. 
+
+```{r list_example}
+# Instead of using names(), you can create lists with components already named
+# The same applies for vectors
+x <- list(
+  name = "hydrogen", 
+  number = 1, 
+  mass = 1.001
+)
+
+x[[2]]
+x[2]
+
+x[[2]] + 3
+x[2] + 3
+x[["number"]]
+# Here, 1 is not coerced to a character
+class(x[["number"]])
+```
+
+Lists are useful for holding separate vectors, which is a useful for repeating simulations. 
+
+## 1.6 Exercise 1: Variance of a vector
+
+*Create a vector `temp` and return its sample variance.*
+
+Sample variance can be calculated for a vector using the function `var()`. Check the results of your calculation against `var(temp)`.
+
+Recall that sample variance is calculated as
+
+$$
+\text{Var}(\mathbf{x}) = \frac{1}{n-1}\sum_{i = 1}^n (x_i - \bar{x})^2.
+$$
+
+If you look at the `.Rmd` source here, you'll see a good example of how to format LaTeX in the file. For display style equations, use double dollar signs; for inline style equations, use single dollar signs.
+
+
+```{r}
+a <- c(1:20)
+var(a) # sample variance
+var(a) * (length(a) - 1) / length(a) # (population) variance
+```
+
+### 1.7 Packages
+
+To install R packages, use the function `install.packages()` with the package name in quotes. After a package has been installed, you can use its functions using double colon notation. For example, if we wanted to use `str_detect()` from `stringr` to find patterns of characters, we could write `stringr::str_detect()`. This can become a hassle, so you can load all the functions in a package with `library(stringr)`.
+
+## 2 Tabular data
+
+This information is useful when considering R in general although it may not be commonly used in STAT110. 
+
+### 2.1 Matrices
+
+Matrices in R can be created using `matrix()`. The first argument is a vector containing the data for the matrix. The second argument is the number of rows or columns and whether the data should be read by row or by column. Default behavior is to read data by columns. 
+
+```{r matrix, eval = T}
+X <- matrix(c(1, 1, 0, 1, 1, 1, 1, 3, 9), nrow = 3, byrow = T)
+X
+```
+
+R can handle various matrix operations. First, indexing can be accomplished using single square brackets. First element is row, and second element is column.
+
+```{r matrix_ops}
+# Get a row of the matrix
+X[1, ]
+
+# Get a column of the matrix
+X[, 1]
+
+# Get the dimensions of X (row, col)
+dim(X)
+
+# Create the transpose of X
+Xt <- t(X)
+
+# Matrix multiplication
+XtX <- Xt %*% X
+
+# Find the inverse of a matrix
+XtX_inverse <- solve(XtX)
+
+# Sanity check (notice zero can sometimes be a very small number)
+XtX %*% XtX_inverse
+```
+
+Matrices can be modified like vectors, though indexing for a single element requires both the row and column coordinate. 
+
+```{r matrix_mod, eval = F}
+# Change a single element at the [2,2] position
+X[2, 2] <- 5
+
+# Replace the first row
+X[1, ] <- c(2, 2, 3)
+
+# Remove the last column
+X <- X[, -3]
+
+# Reset the matrix
+X <- matrix(c(1, 1, 0, 1, 1, 1, 1, 3, 9), nrow = 3, byrow = T)
+```
+
+### 2.2 Data frames
+
+Data frames are more flexible than matrices. They can be created from matrices or created by supplying the columns. The two methods shown below create the same data frame. 
+
+```{r dataframe, eval = T}
+Y <- data.frame(X)
+names(Y) <- c("Q", "W", "E")
+Y
+X
+
+Y <- data.frame(
+  Q = c(1, 1, 1), 
+  W = c(1, 1, 3), 
+  E = c(0, 1, 9)
+)
+Y
+```
+
+Structurally, data frames are lists of vectors, where each vector corresponds to a column. So, while a data frame can contain many data types, each column corresponds to only one data type. 
+
+We can access the columns of a data frame by name using the dollar sign, double brackets, or single brackets. Rows can also be retrieved and modified with similar operations.
+
+By supplying elements to a new index, you can also add elements to the data frame.
+
+```{r dataframe_index}
+# The following commands return the same element: the first column of Y
+Y[["Q"]]
+Y[[1]]
+Y$Q
+Y[, "Q"]
+
+# Rows can also be named and indexed that way
+# Rows cannot use dollar sign notation or double brackets
+# The following all return the first row of Y
+rownames(Y) <- c("A", "S", "D")
+Y["A", ]
+Y[1, ]
+
+# The following both return the middle element of Y
+Y[2, 2]
+Y["S", "W"]
+
+# Either of the following would add the the column `R`
+# This is added to the end of the data frame
+Y[, 4] <- c("Joe", "Joe and Neil", "Kevin")
+names(Y)[4] <- "R"
+
+Y$R <- c("Joe", "Joe and Neil", "Kevin")
+
+# Remove the column
+Y <- Y[, -4]
+```
+
+We can filter data frames by supplying Boolean vectors when indexing. Additionally, because of the helpful element-wise properties of R vectors, we can use this property to sort data frames.
+
+```{r dataframe_filter, eval = T}
+# We want rows of the data frame where the second element is 1
+Y[Y$W == 1, ]
+```
+
+### 2.3 Exercise 3: Datasets in R
+
+R has a variety of example data sets that you can look through using the function `data()`. Take a look at the data set `iris`, which you can view by entering `iris`. (Think of the data set as an "invisible" variable that contains the data frame.)
+
+*Which of the flower species has the widest petals, on average?*
+
+### 2.4 Miscellaneous useful commands
+
+To view the first few rows of a data frame or first few elements of a vector/list, use `head()`. To view the last elements, use `tail()`. You can supply an optional second argument specifying the number of elements you want to see.  
+
+```{r}
+head(iris, 3)
+```
+
+### 2.5 Further reading
+
+There are more advanced (and convenient, if you want to put time into learning) ways of sorting data frames using the packages `tibble`, `dplyr`, and `tidyr`. These will largely not be necessary for STAT 111, though reach out if you want any tips!
+
+For example, we can use `dplyr` to solve Exercise 3 with:
+
+```{r}
+library(dplyr)
+iris %>%
+  group_by(Species) %>%
+  summarize(petal_width_avg = mean(Petal.Width), .groups = "drop") %>%
+  top_n(1, petal_width_avg) %>%
+  .$Species
+```
+
+## 3 Iteration
+
+### 3.1 For loops
+
+For loops are common in STAT 111. They allow you to run some code for every element in a collection. For example:
+
+```{r forloop_ex, eval = T}
+my_vector <- c(110, 111, 139) # Numbers 1 through 10
+for (i in my_vector) {
+  print(i %% 17)
+}
+```
+
+### 3.2 Vectorized operations
+
+For loops can be useful but are usually not the most efficient solution. For example, we could accomplish the same task as the example in 4.1 with a single vector operation.
+
+```{r}
+my_vector %% 17
+```
+
+### 3.3 Replicate
+
+The function `replicate` repeatedly evaluates an expression. This is useful for simulations, which we will see in the example of the Birthday Problem. The following is an example of sampling 10 times from an Exponential distribution 100 times. 
+
+```{r replicate_ex}
+rexp(10, 1)
+result <- replicate(100, rexp(10, 1), simplify = F)
+result
+```
+
+## 4 Functions and control flow
+
+### 4.1 Creating functions
+
+Replication is most useful when combined with custom functions. We can define a function to find the element with the highest magnitude in a vector like so:
+
+```{r}
+# We can set default values to arguments in functions, like na.rm here
+max_magnitude <- function(vec, na.rm = T) {
+  max(abs(vec), na.rm = na.rm)
+}
+
+max_magnitude(c(NA, -50, 51, -61, 121, -124))
+```
+
+### 4.2 Control flow
+
+R uses fairly intuitive control flow with notation for `if`, `else if`, and `else`. Additionally, a value of 0 evaluates to `FALSE` and any other value evaluates to `TRUE`.
+
+```{r control_flow}
+for (i in 1:5) {
+  if (i %% 2) {
+    message(i, " is odd")
+  } else {
+    message(i, " is even")
+  }
+}
+
+```
+
+R also has switch-case capabilities, though it is unlikely to be used in this class.
+
+## 5 Plotting
+
+R has base functions for plotting, but I personally dislike them. Instead, we'll be using `ggplot2`. 
+
+This may or may not be useful in STAT110 so feel free to skip this section.
+
+### 5.1 Creating a scatterplot
+
+```{r, eval = T}
+# install ggplot2 if you haven't already
+# install.packages(ggplot2)
+library(ggplot2)
+
+# Let's generate some example data
+predictor <- rnorm(10)
+response <- 10 + 2*predictor + rnorm(10, 0, .5)
+# Create a data frame of data
+df <- data.frame(predictor, response)
+
+ggplot(data = df, aes(x = predictor, y = response)) + 
+  geom_point() + # create points with x and y 
+  # create blue linear regression line
+  geom_smooth(method = "lm", se = F, color = "blue") + 
+  # create red true regression line
+  geom_abline(slope = 2, intercept = 10, color = "red") + 
+  # make it pretty (optional)
+  theme_bw()
+```
+
+### 5.2 Creating a histogram
+
+We can generate 400 samples from an Exponential distribution with $\lambda = 1$ and see how the histogram compared to the known PDF of the distribution.
+
+```{r, eval = T}
+# Generate samples of data
+expo_samp <- rexp(400, 1)
+expo_samp_df <- data.frame(expo_samp)
+
+# Generate known PDF
+x <- seq(0, 7, by = 0.01)
+expo_pdf <- dexp(x, 1)
+expo_df <- data.frame(x, expo_pdf)
+
+
+ggplot(data = expo_samp_df, aes(x = expo_samp)) + 
+  # An ordinary histogram would not have the additional aes() arg
+  geom_histogram(aes(y =..density..)) + 
+  # Add a line for the PDF (use different data)
+  geom_line(data = expo_df, aes(x = x, y = expo_pdf), color = "red") + 
+  theme_bw()
+```
+
+### 5.3 Equivalent functions in base R
+
+If you're curious about how to do the same things using base R (without needing to install `ggplot2`) here's a brief summary. 
+
+```{r base_plot, eval = T}
+# Make a scatter plot with the same data
+plot(predictor, response, xlab = "Predictor", ylab = "Response")
+# Add calculated linear regression line
+abline(lm(response ~ predictor), col = "blue")
+# Add true regression line
+abline(10, 2, col = "red")
+
+# Make a histogram with the same data
+# To make a normal histogram, set freq = T
+hist(expo_samp, freq = F)
+curve(dexp(x, 1), col = "blue", add = T) 
+```
+
+\newpage 
+
+## Practice problems
+
+### Birthday problem
+
+The following process may be helpful but not mandatory to solve the problem via simulation.
+
+First, try simulating a single draw of the birthday problem with 25 people. For example, randomly generate numbers between 1 and 365 and then store the result.
+
+
+```{r}
+set.seed(20210909)
+# One round of the birthday problem
+x <- round(runif(23, 1, 365))
+sum(duplicated(x)) > 0
+
+bday <- function() {
+  x <- round(runif(23, 1, 365))
+  sum(duplicated(x)) > 0 
+}
+
+y <- replicate(10000, bday())
+mean(y)
+```
+
+\newpage
+
+## Miscellaneous Advice
+
+Everything you want to know about R Markdown can be found in this documentation: 
+[R Markdown Cookbook](https://bookdown.org/yihui/rmarkdown-cookbook/)
+
+A cheat sheet is also provided here: [R Markdown Cheat Sheet](https://rstudio.com/wp-content/uploads/2016/03/rmarkdown-cheatsheet-2.0.pdf)
+
+I've included some of the more important notes for STAT 111 here.
+
+### Setup for LaTeX
+
+The easiest way to go about this is useing the `tinytex` package to install TinyTeX. You can do this with
+
+```{r, eval = F}
+# install.packages("tinytex")
+tinytex::install_tinytex()
+```
+
+### Replicating "random" variables
+
+In order to set the RNG to be replicable, use `set.seed()`, where the argument is some number of your choosing.
+
+### Chunk options
+
+When creating R chunks, you can alter the settings by adding additional fields to
+the header of the chunk. Here are some useful settings:
+
+- `echo`: Set to `F` (equivalent to `FALSE`) to have the results of code chunks 
+display in the output file while the code chunk is hidden. 
+- `include`: Set to `F` to hide a code chunk. The chunk will still evaluate, but
+will be hidden in the file. This is different from `echo = F` because `include =
+F` will not include graphs.
+- `eval`: Set to `F` to have code be rendered in the output but not evaluated. 
+- `message`: Set to `F` to suppress messages from displaying. Works well with
+`include = F` when loading libraries.
+- `warning`: Set to `F` to suppress warnings from displaying. 
+- `cache`: See [Time-saving measures](#anchor)
+
+For example, if I wanted to run a code chunk to disaply a graph without including
+all the code in the final document, I would change the content within the 
+brackets starting the code chunk to be `{r, echo = F}`. The comma after `r` is
+important to include!
+
+To globally alter chunk settings, use `knitr::opts_chunk$set(...)`, where the 
+ellipses are replaced with the settings you want. A good example of this is found
+in the default R Markdown loaded when you create a new `.Rmd` file in RStudio. 
+
+### Time-saving measures {#anchor}
+
+When knitting R Markdown files, PDF files are processed more slowly than HTML
+files. When drafting homework, it's useful to check your LaTeX (e.g., making
+sure there aren't any formatting errors) using HTML as the output before
+finalizing the file as a PDF. You can do this by modifying the `output` field in
+the header of the R Markdown file. By changing the header to read `output:
+html_document` (or selecting HTML when creating the file), the file will knit as
+an HTML. To switch to a PDF, use `output: pdf_document`.
+
+Additionally, some psets will require running simulations with many repetitions.
+To prevent the code from running these simulations every time you knit, you can
+adjust the header for R code chunks to cache the results of the chunk. This will
+prevent the chunk from executing in subsequent knits if it is detected that the
+contents of the file have not been modified.
+
+```{r cache_example, cache = T}
+# Check the R Markdown source to see how this is done!
+```
+
+However, it is also possible to manually save files. This is useful because using
+caching can come with caveats and you may invalidate your cache unexpectedly. To
+manually save R objects, use `saveRDS` and `readRDS`.
+
+```{r rds_example, eval = F}
+# Let `helium` be the R object of interest
+# You can name the file anything you want
+saveRDS(helium, file = "helium.RDS")
+helium <- readRDS(file = "helium.RDS")
+```
+
+### Help
+
+For functions, you can get view documentation by using a question mark. For
+example, `?replicate`. 
+
+You can also view the contents of a function by entering only the function name, 
+no parentheses. This is useful for troubleshooting custom functions. 
