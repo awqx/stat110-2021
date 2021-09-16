@@ -9,6 +9,8 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+Materials are availabile in Section Materials > Al on Canvas or on
+
 ## Overview
 
 In probability, we often use counting methods to determine the size of sample spaces, distinct events, etc. 
@@ -168,6 +170,8 @@ We can make a graphical representation of this scenario. We can also estimate er
 ```
 
 ## Other notes
+
+You can create HTML documents in R Markdown. This is helpful for faster knitting before formatting a PDF. 
 
 The style I use for coding in R has been influenced by Hadley Wickham's style guide, available here: https://adv-r.had.co.nz/Style.html. 
 
