@@ -1,0 +1,174 @@
+---
+title: 'STAT 110 Section 02: Simulation and Counting'
+author: "Al Xin"
+date: "9/16/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview
+
+In probability, we often use counting methods to determine the size of sample spaces, distinct events, etc. 
+
+Additionally, when you are starting to become familiar with properties of probability (like inclusion-exclusion), it is helpful to have a method of simulating results, especially if results are not intuitive.
+
+## Counting
+
+In lecture, we reviewed different methods of counting for sampling with and without replacement and sampling when order does or does not matter. 
+
+Let $n$ be the number of options we have and let $k$ be the number of samples we take. As a quick review, we have the following methods: 
+
+- Sampling with replacement, order does matter: $n^k$
+- Sampling with replacement, order does not matter: $\binom{n + k - 1}{k}$
+  - Bose-Einstein analagous problem
+- Sampling without replacement, order does matter: $n (n - 1) \cdots (n - k + 1)$
+- Sampling without replacement, order does not matter: $\binom{n}{k}$
+
+### Sampling in R
+
+In R, we have several analagous functions for these scenarios. One of the most useful functions is `sample`. Take a look at `?sample` and its parameters. 
+
+What are the appropriate function calls for the following scenarios? Fill in the code below each comment. 
+
+```{r}
+# Define n and k; population and sample_size
+population <- 110
+sample_size <- 10
+
+# Sampling with replacement
+
+# Sampling without replacement
+
+# Creating a permutation
+
+```
+
+However, although the above creates a sample, it does not provide detail on how many samples exist. To count the samples, R can help with a brute force approach.
+
+Q: What does "brute force" mean?
+
+Hint: the function `expand.grid` may be helpful.
+
+```{r}
+# Brute force approach
+
+```
+
+Sampling when order does not matter can be more difficult to reproduce. There may not be a default R function for this type of sampling but we can cobble together some functions to make this work. 
+
+There are many ways of solving this problem. Try and think of your own solutions. The one I will demonstrate is not particularly elegant but it works.
+
+```{r}
+# Brute force counting of unordered combinations 
+
+# Sampling with replacement
+
+# Sampling without replacement
+
+```
+
+Alternatively, if you remember the properties, you can use the function `choose()`. 
+
+## Simulation
+
+The simulation for the birthday problem and De Montmort has been sourced from lecture and from the textbook. 
+
+### Birthday problem
+
+What is the probability that there is at least one shared birthday in a group of people? This is a nice introductory result on how probability can be counter-intuitive. 
+
+Q: Why is the probability of a shared birthday much higher than $n/365$, which is what many people intuitively guess?
+
+There are a few ways of solving this problem. This is mostly a review of last week, with a couple new tricks. 
+
+```{r}
+# Last week
+bday <- function(n = 25) {
+  x <- round(runif(n, 1, 365))
+  match_bday <- length(x) - length(unique(x))
+  y <- ifelse(match_bday > 0, T, F)
+  y
+}
+
+# Solving with `sample` instead of `runif`
+
+# Solving with `duplicated`
+
+# Solving with `tabulate`
+
+# Solving with built-in functions
+
+# Solving with built-in functions
+
+```
+
+#### Reverse birthday problem
+
+How many people would be required for the group to have a 50% chance of having a birthday on your birthday?
+
+Q: What is the intuitive answer?
+
+Q: Can you solve this purely with simulation or should you derive this mathematically first?
+
+```{r}
+# Insert solution here
+```
+
+#### Extra special bonus
+
+How many people would be required for the group to have a 50% chance of having a birthday on every day of the year?
+
+```{r}
+
+```
+
+
+### De Montmort (matching problem)
+
+Although it is theoretically possible to generate every arrangement of cards and then determine if they are winning, this is probably not useful.
+
+Q: Why would this be a bad idea? (Don't overthink this).
+
+```{r}
+
+```
+
+
+## More examples
+
+In many cases, how you simulate a problem can be influenced by the exact nature of the problem. In many cases, you can find easier ways to represent data. 
+
+### Phone number problem
+
+Let's work through simulation of the phone number problem from the homework. Note that this solution will likely *not* be accepted as the full solution, but it is a useful check. 
+
+```{r}
+# How many unique 7-digit numbers can be created that do not start with 0 or 1?
+
+# From the 0,1 set, how many numbers can be created that do not art with 911?
+```
+
+### Tagging animals to estimate population
+
+To determine the population of a species in a region, it is impractical to count all of them. Instead, field biologists may tag, release, and recapture animals. 
+
+Field researchers will capture a certain number of animals in a region and harmlessly tag them. The animals are then released. After a certain period of time, the same number of animals is recaptured and the number of tagged animals is counted. Using this method, researchers are able to estimate the population.
+
+Q: What are the assumptions in this scenario?
+
+The random variable distribution that dictates the dynamics here is the Negative Binomial. We will discuss this in a future lecture.
+
+We can make a graphical representation of this scenario. We can also estimate error bars. 
+
+```{r}
+
+```
+
+## Other notes
+
+The style I use for coding in R has been influenced by Hadley Wickham's style guide, available here: https://adv-r.had.co.nz/Style.html. 
+
+For any simulation, make sure you understand the problem before you attempt to simulate it. This has been an issue with De Montmort's matching problem. 
