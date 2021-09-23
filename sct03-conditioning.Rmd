@@ -1,0 +1,128 @@
+---
+title: 'STAT 110 Section 03: Conditioning'
+author: "Al Xin"
+date: "9/23/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Materials are availabile in Section Materials > Al on Canvas or on GitHub at https://www.github.com/awqx/stat110-2021. 
+
+## Overview
+
+Topics covered this week: 
+
+- Conditional probability
+- Bayes' rule
+- Law of total probability
+- Independence
+- Conditional independence
+
+## Conditional probability
+
+R has several available datasets, viewable using `data()`. For this section, we will be using `iris` and `HairEyeColor`.
+
+### Iris
+
+```{r}
+# Run the following to view the `iris` dataset
+iris
+```
+
+First, let's examine the dataset. If you use the function `View(iris)`, the resulting table has more convenient sorting properties than looking through the dataset in the console. 
+
+```{r}
+View(iris)
+```
+
+We can also create a visual representation of the data. Choose any two quantitative variables and create a plot, coloring each dot according to the iris species. 
+
+```{r}
+library(ggplot2)
+```
+
+We should be able to see some clustering of the variables. This clustering lends itself to some conditioning. 
+
+Let's compare the probability that a flower is a member of any species given its physical characteristics. 
+
+First, investigate the two columns of `Petal.Width` and `Species`. Do you notice any trends? 
+
+```{r}
+library(dplyr)
+View(select(iris, Petal.Width, Species))
+
+# There's a more "intuitive" way to run the above command
+```
+
+Can you think of a conditional probability rule that maximizes the probability that a flower is a `setosa` given a condition?
+
+What about `versicolor` and `virginica`?
+
+### Hair and Eye Color
+
+Like with `iris`, view the data to get an idea of what it looks like. Have we seen this type of dataset before? Experiment with indexing this type of data. 
+
+```{r}
+HairEyeColor
+View(HairEyeColor)
+```
+
+Try casting this `table` to a `data.frame` for easier sorting with our functions. Alternatively, if you know the labels for the rows and columns, you can complete the conditional probabilities using that method. 
+
+What is the conditional probability that a student has green eyes given that they have black hair?
+
+What is the conditional probability that a student with blue eyes is female?
+
+## Law of total probability
+
+Let's look at `HairEyeColor` again.
+
+- What is the unconditional probability that a student has black hair?
+- What is the unconditional probability that a student is female?
+- What is the unconditional probability that a student is male?
+
+Check if these approaches are equivalent:
+
+- What is the sum of the intersection of probabilities of (black hair, female) and (black hair, male)?
+- What is the sum of the products of the conditional probabilities (LOTP)?
+
+## Conditional independence
+
+Take a look at the data `Titanic`. What does this data represent?
+
+Answer the following questions:
+
+- Is survival independent of passenger class?
+- Is survival independent of age?
+
+## Applied R
+
+### Choosing cards
+
+In R, we can compute the binomial coefficient with the expression `choose`. For example, if determining the number of ways to select 5 cards from a pack of 52, we would run the following code: 
+
+```{r}
+choose(52, 5)
+```
+
+R also has the function `factorial`. Try calculating the binomial coefficient with all terms included and make sure that it agrees with your previous answer.
+
+```{r}
+factorial(1)
+```
+
+Let's apply this to a particular function to a card-choosing problem. What is the probability of selecting a full house in a random selection of 5 cards from a 52 card deck?
+
+```{r}
+choose()
+```
+
+Functions like choose can also be vectorized. This may be helpful in checking one of the homework problems. See an example below:
+
+```{r}
+choose()
+```
+
