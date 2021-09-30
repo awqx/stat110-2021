@@ -215,5 +215,6 @@ wolf_sim <- function(sheep = 50) {
 }
 
 wolf_rep <- replicate(10000, wolf_sim())
+mean(wolf_rep) # result is 0.0112
 ```
 
