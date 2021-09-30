@@ -1,0 +1,219 @@
+---
+title: 'STAT 110 Section 04: Discrete Random Variables'
+author: "Al Xin"
+date: "9/30/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+if(!require("tidyverse")) {
+  install.packages("tidyverse")
+  require(tidyverse)
+}
+```
+
+## Overview
+
+For the purposes of STAT 110, a random variable is a variable that takes on values with a probability for each value. So far, we've looked at discrete distributions of random variables, like the Binomial and Hypergeometric. The probability distribution of discrete random variables is described by the probability mass function. For each possible value in the support of a discrete random variable with a named distribution, we can calculate the probability of any specific value.
+
+## Probability mass function
+
+As its name suggests, the probability mass function operates as a function. The input is an event and the output is a valid probability. The probabilities of all values in the support of a random variable is 1; by definition, the random variable must take on at least one of its possible values. For a discrete random variable with support $\{0, 1, \dots, n}$, for example, we would have $\sum_i P(X = i)$ where $i \in \{0, 1, \dots, n\}$.
+
+Note that the input for a PMF is an event. You cannot input a random variable into a PMF. 
+
+## Binomial distribution
+
+### Story
+
+First, we have to consider a Bernoulli distribution. 
+
+A Bernoulli is the simplest discrete random variable. It is a variable that takes on the value 1 with probability $p$ and the value 0 with probability $1 - p$, often abbreviated as $q$. Imagine a Bernoulli random variable as flipping a coin that can be weighted towards heads with probability $p$. 
+
+R has built-in functions for simulating most of the named distributions we will learn in this class. In general, random variable functions come in four different categories: 
+
+- `d`: density function
+- `p`: distribution function
+- `q`: quantile function
+- `r`: random generation
+
+For example, a binomial random variable has the functions `dbinom`, `pbinom`, `qbinom`, and `rbinom`. Experiment with these in order to get a feel of their inputs and return values. 
+
+```{r}
+# dbinom gives you the PMF evaluated at the event that the
+# binomial rv yields the first argument
+dbinom(8, 20, 0.4)
+
+# Cumulative PMF at the argument
+# monotonically increasing
+pbinom(c(1:25), 20, 0.4)
+
+# Input is quantile
+# Gives you the boundary to reach that quantile
+qbinom(0.5, 20, 0.4)
+
+# Random number generation
+rbinom(55, 20, 0.4)
+
+# set.seed to make results reproducible
+set.seed(20210930)
+rbinom(55, 20, 0.4)
+```
+
+### Simulation example
+
+On the homework problem, we have an example of a coin flipping problem.
+
+First, simulate the coin flipping with $p_1 = 0.3, p_2 = 0.7, n = 50$ and $1000$ replications. 
+
+```{r}
+coin1 <- rbinom(1000, 50, 0.3)
+coin2 <- rbinom(1000, 50, 0.7)
+x <- sample(0:1, 1000, replace = T)
+coin_choice <- c(
+  coin1[!x], 
+  coin2[as.logical(x)]
+)
+```
+
+Second, plot the distribution of the number of heads. What do you notice?
+
+```{r}
+library(ggplot2)
+df <- data.frame(
+  x = c(1:length(coin_choice)), 
+  coin_choice
+)
+ggplot(df, aes(x = coin_choice)) + 
+  geom_bar()
+```
+
+Compare the distribution with that of the average of the probabilities. 
+
+What happens if $p_1 = 0.45, p_2 = 0.55, n = 30$, with $1000$ replications? What happens if $n = 300$?
+
+```{r}
+coin1 <- rbinom(10000, 300, 0.45)
+coin2 <- rbinom(10000, 300, 0.55)
+x <- sample(0:1, 10000, replace = T)
+coin_choice <- c(
+  coin1[!x], 
+  coin2[as.logical(x)]
+)
+
+ggplot(data.frame(coin_choice), aes(x = coin_choice)) + 
+  geom_bar()
+```
+
+
+## Hypergeometric distribution
+
+What is the story of the hypergeometric distribution? Unlike the binomial distribution, the Hypergeometric distribution does not assume that "trials" are independent. The story is usually explained with selecting $n$ balls from an urn with $w$ white and $b$ black balls. What is the probability of selecting $k$ white balls if you sample without replacement?
+
+Note that in R, m is number of white balls, n is number of black balls, and k is number of balls drawn. 
+
+### Simulation
+
+In many cases when the Hypergeometric is appropriate, we assume that the selection is independent. What homework problem does this remind you of?
+
+We can run a few simulations to demonstrate that, under certain conditions, the Hypergeometric can be approximated by the Binomial. 
+
+First, look at the documentation of `rhyper`. What are the parameters?
+
+Simulate the sampling of $10$ balls from an urn with $5$ white balls and $20$ black balls. Plot the distribution of $10000$ replications. 
+
+```{r}
+hyper <- rhyper(10000, 5, 20, 10)
+df <- data.frame(
+  x = 1:1000, 
+  hyper
+)
+ggplot(df, aes(x = hyper)) + 
+  geom_bar()
+```
+
+Compare the above distribution to the distribution of a Binomial with $10$ samples and an appropriate $p$ (what is the $p$ we can use to "approximate" the above Hypergeometric?)
+
+```{r}
+binom <- rbinom(10000, 10, 0.2)
+df <- data.frame(df, binom) # wide table - not good for plotting
+df <- rbind(
+  data.frame(
+    balls = hyper, 
+    distribution = "hgeom"
+  ), 
+  data.frame(
+    balls = binom, 
+    distribution = "binom"
+  )
+)
+ggplot(df, aes(x = balls, fill = distribution)) + 
+  geom_bar(position = "dodge")
+```
+
+Now, compare the results with sampling $10$ balls from an urn with $500$ white balls and $2000$ black balls. 
+
+```{r}
+df <- rbind(
+  data.frame(
+    balls = rhyper(10000, 500, 2000, 10), 
+    distribution = "hgeom"
+  ), 
+  data.frame(
+    balls = rbinom(10000, 10, 0.2), 
+    distribution = "binom"
+  )
+)
+ggplot(df, aes(x = balls, fill = distribution)) + 
+  geom_bar(position = "dodge")
+```
+
+Compare the results with sampling $500$ balls. 
+
+```{r}
+df <- rbind(
+  data.frame(
+    balls = rhyper(50000, 500, 2000, 500), 
+    distribution = "hgeom"
+  ), 
+  data.frame(
+    balls = rbinom(50000, 500, 0.2), 
+    distribution = "binom"
+  )
+)
+ggplot(df, aes(x = balls, fill = distribution)) + 
+  geom_bar(position = "dodge")
+```
+
+## More fun with simulation
+
+On the last problem, you have a very intereting problem involving a wolf traveling around a circle. Although there is an elegant solution with symmetry, we can confirm the answer using simulation. 
+
+This will be a bit more involved than our previous simulation attempts, considering the nature of the problem. 
+
+Questions to consider:
+
+- How can we represent a random walk using R functions?
+  - Randomly sample $(-1, +1)$ and update
+- How do we encode our end conditions?
+  - Don't run the entire simulation
+  - Only run until 50 (or whatever off-by-one error is the middle sheep)
+  - Check if 49, 51 exist in the vector of the wolf's path
+- Are there different solutions to this problem? Which would be best in our case?
+
+```{r}
+wolf_sim <- function(sheep = 50) {
+  wolf <- sample(c(-1, 1), 1)
+  while(tail(wolf, 1) != sheep) {
+    wolf <- c(wolf, (tail(wolf, 1) + sample(c(-1, 1), 1)) %% 99)
+  }
+  
+  return(
+    (sheep - 1) %% 99 %in% wolf & (sheep + 1) %% 99 %in% wolf
+  )
+}
+
+wolf_rep <- replicate(10000, wolf_sim())
+```
+
