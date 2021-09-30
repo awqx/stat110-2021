@@ -6,3 +6,4 @@ sct01-intro_r_files
 sct01-intro_r_cache
 sct01-intro_r-ans_files
 sct01-intro_r-ans_cache
+*.R

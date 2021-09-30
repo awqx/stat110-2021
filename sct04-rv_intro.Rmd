@@ -1,0 +1,85 @@
+---
+title: 'STAT 110 Section 04: Discrete Random Variables'
+author: "Al Xin"
+date: "9/30/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+if(!require("tidyverse")) {
+  install.packages("tidyverse")
+  require(tidyverse)
+}
+```
+
+## Overview
+
+For the purposes of STAT 110, a random variable is a variable that takes on values with a probability for each value. So far, we've looked at discrete distributions of random variables, like the Binomial and Hypergeometric. The probability distribution of discrete random variables is described by the probability mass function. For each possible value in the support of a discrete random variable with a named distribution, we can calculate the probability of any specific value.
+
+## Probability mass function
+
+As its name suggests, the probability mass function operates as a function. The input is an event and the output is a valid probability. The probabilities of all values in the support of a random variable is 1; by definition, the random variable must take on at least one of its possible values. For a discrete random variable with support $\{0, 1, \dots, n}$, for example, we would have $\sum_i P(X = i)$ where $i \in \{0, 1, \dots, n\}$.
+
+Note that the input for a PMF is an event. You cannot input a random variable into a PMF. 
+
+## Binomial distribution
+
+### Story
+
+First, we have to consider a Bernoulli distribution. 
+
+A Bernoulli is the simplest discrete random variable. It is a variable that takes on the value 1 with probability $p$ and the value 0 with probability $1 - p$, often abbreviated as $q$. Imagine a Bernoulli random variable as flipping a coin that can be weighted towards heads with probability $p$. 
+
+R has built-in functions for simulating most of the named distributions we will learn in this class. In general, random variable functions come in four different categories: 
+
+- `d`: density function
+- `p`: distribution function
+- `q`: quantile function
+- `r`: random generation
+
+For example, a binomial random variable has the functions `dbinom`, `pbinom`, `qbinom`, and `rbinom`. Experiment with these in order to get a feel of their inputs and return values. 
+
+### Simulation example
+
+On the homework problem, we have an example of a coin flipping problem.
+
+First, simulate the coin flipping with $p_1 = 0.3, p_2 = 0.7, n = 5000$. 
+
+Second, plot the distribution of the number of heads. What do you notice?
+
+Compare the distribution with that of the average of the probabilities. 
+
+What happens if $p_1 = 0.4, p_2 = 0.6, n = 5000$? What happens if $n = 10000$?
+
+## Hypergeometric distribution
+
+What is the story of the hypergeometric distribution? Unlike the binomial distribution, the Hypergeometric distribution does not assume that "trials" are independent. The story is usually explained with selecting $n$ balls from an urn with $w$ white and $b$ black balls. What is the probability of selecting $k$ white balls if you sample without replacement?
+
+### Simulation
+
+In many cases when the Hypergeometric is appropriate, we assume that the selection is independent. What homework problem does this remind you of?
+
+We can run a few simulations to demonstrate that, under certain conditions, the Hypergeometric can be approximated by the Binomial. 
+
+First, look at the documentation of `rhyper`. What are the parameters?
+
+Simulate the sampling of $10$ balls from an urn with $5$ white balls and $20$ black balls. Plot the distribution of $10000$ replications. 
+
+Compare the above distribution to the distirbution of a Binomial with $10$ samples and an appropriate $p$ (what is the $p$ we can use to "approximate" the above Hypergeometric?)
+
+Now, compare the results with sampling $10$ balls from an urn with $500$ white balls and $2000$ black balls. 
+
+Compare the results with sampling $500$ balls. 
+
+## More fun with simulation
+
+On the last problem, you have a very intereting problem involving a wolf traveling around a circle. Although there is an elegant solution with symmetry, we can confirm the answer using simulation. 
+
+This will be a bit more involved than our previous simulation attempts, considering the nature of the problem. 
+
+Questions to consider:
+
+- How can we represent a random walk using R functions?
+- How do we encode our end conditions?
+- Are there different solutions to this problem? Which would be best in our case?
